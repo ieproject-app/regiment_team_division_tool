@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regiment Team Division Tool</title>
+    <style>
+        /* Reset dan Base Styling */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 10px; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 20px; text-align: center; color: white; }
+        .header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 5px; }
+        .header p { font-size: 1rem; opacity: 0.9; }
+        .form-section { padding: 25px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #333; font-size: 0.95rem; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px 15px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #4facfe; box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1); }
+        .form-group textarea { resize: vertical; min-height: 120px; }
+        .file-input-container { position: relative; display: inline-block; width: 100%; }
+        .file-input { position: absolute; left: -9999px; }
+        .file-input-label { display: inline-block; padding: 12px 20px; background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 100%; font-size: 0.95rem; color: #666; }
+        .file-input-label:hover { background: #e9ecef; border-color: #4facfe; }
+        .status-section { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .status-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.9rem; }
+        .status-label { font-weight: 500; color: #666; }
+        .status-value { font-weight: 600; color: #333; }
+        .regiment-preview { background: #e8f4fd; padding: 15px; border-radius: 10px; margin-top: 10px; border-left: 4px solid #4facfe; }
+        .regiment-preview h4 { color: #2c5aa0; margin-bottom: 10px; font-size: 0.9rem; }
+        .regiment-list { max-height: 200px; overflow-y: auto; }
+        .regiment-item { background: white; padding: 8px 12px; margin-bottom: 6px; border-radius: 6px; border: 1px solid #d1ecf1; }
+        .regiment-name { font-weight: 600; color: #2c5aa0; font-size: 0.85rem; }
+        .regiment-members { font-size: 0.75rem; color: #666; margin-top: 2px; }
+        .alert { padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; font-weight: 500; }
+        .alert-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .btn { display: inline-block; padding: 14px 30px; border: none; border-radius: 50px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; text-align: center; min-width: 150px; margin: 5px; }
+        .btn-primary { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+        .btn-secondary { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3); }
+        .btn-secondary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(168, 237, 234, 0.3); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+        .btn-container { text-align: center; margin: 25px 0; }
+        .teams-output { background: white; padding: 20px; border-radius: 15px; margin-top: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .teams-title { text-align: center; font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; color: #333; }
+        .teams-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; max-width: 100%; }
+        .team-card { background: #f8f9fa; border-radius: 12px; padding: 15px; border: 2px solid #e9ecef; transition: transform 0.2s ease; }
+        .team-card:hover { transform: translateY(-2px); }
+        .team-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 12px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; text-align: center; margin-bottom: 10px; }
+        .team-regiments { list-style: none; }
+        .team-regiment { padding: 8px 12px; margin-bottom: 8px; background: white; border-radius: 8px; border: 1px solid #e9ecef; }
+        .regiment-header { font-weight: 600; color: #2c5aa0; font-size: 0.85rem; margin-bottom: 4px; border-bottom: 1px solid #e9ecef; padding-bottom: 2px; }
+        .regiment-member { padding: 2px 8px; font-size: 0.8rem; color: #666; }
+        .generation-info { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #28a745; }
+        .generation-info h3 { color: #155724; margin-bottom: 10px; font-size: 1.1rem; }
+        .generation-info p { margin-bottom: 8px; font-size: 0.9rem; color: #333; }
+        @media (max-width: 768px) { .header h1 { font-size: 1.5rem; } .form-section { padding: 20px; } .teams-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; } .team-card { padding: 12px; } .team-header { font-size: 0.8rem; padding: 6px 10px; } }
+        @media (max-width: 480px) { .teams-grid { grid-template-columns: 1fr; } }
+        .loading { text-align: center; padding: 20px; color: #666; font-style: italic; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 Regiment Team Division Tool</h1>
+            <p>Bagi tim berdasarkan regu secara adil dan acak</p>
+        </div>
+        <div class="form-section">
+            <div class="form-group">
+                <label for="regimentsPerTeam">Regu per Tim:</label>
+                <input type="number" id="regimentsPerTeam" min="1" max="10" value="2">
+                <small style="color: #666; font-size: 0.85rem; margin-top: 5px; display: block;">
+                    Jumlah regu yang akan ditempatkan di setiap tim
+                </small>
+            </div>
+            <div class="form-group">
+                <label for="regimentData">Data Regu (Format: Nama Regu | Anggota1, Anggota2, ...):</label>
+                <textarea id="regimentData" placeholder="Masukkan data regu...&#10;Contoh:&#10;Regu Merah | Ahmad Budi, Siti Aminah, Dani Pratama&#10;Regu Biru | Eka Sari, Budi Santoso, Rina Wati&#10;Regu Hijau | Toni Wijaya, Maya Dewi"></textarea>
+                <small style="color: #666; font-size: 0.85rem; margin-top: 5px; display: block;">
+                    Gunakan tanda "|" untuk memisahkan nama regu dan daftar anggota. Pisahkan anggota dengan koma.
+                </small>
+            </div>
+            <div class="form-group">
+                <label>Import File (.txt):</label>
+                <div class="file-input-container">
+                    <input type="file" id="fileInput" class="file-input" accept=".txt">
+                    <label for="fileInput" class="file-input-label">📁 Pilih file .txt (opsional)</label>
+                </div>
+                <div id="fileName" class="mt-2 text-sm text-gray-600"></div>
+            </div>
+            <div class="status-section">
+                <div class="status-item"><span class="status-label">Total Regu:</span><span class="status-value" id="totalRegiments">0</span></div>
+                <div class="status-item"><span class="status-label">Total Anggota:</span><span class="status-value" id="totalMembers">0</span></div>
+                <div class="status-item"><span class="status-label">Tim yang Dibutuhkan:</span><span class="status-value" id="teamsNeeded">0</span></div>
+                <div class="status-item"><span class="status-label">Status:</span><span class="status-value" id="validationStatus">Siap untuk input</span></div>
+            </div>
+            <div id="regimentPreview" class="regiment-preview hidden">
+                <h4>👥 Preview Regu yang Terdeteksi:</h4>
+                <div id="regimentList" class="regiment-list"></div>
+            </div>
+            <div id="alertContainer"></div>
+            <div class="btn-container"><button id="generateBtn" class="btn btn-primary" disabled>🎲 Generate Tim</button></div>
+        </div>
+        <div id="teamsOutput" class="teams-output hidden">
+            <h2 class="teams-title">📋 Hasil Pembagian Tim</h2>
+            <div id="generationInfo" class="generation-info hidden">
+                <h3>📊 Informasi Generate:</h3><div id="generationDetails"></div>
+            </div>
+            <div class="btn-container"><button id="exportBtn" class="btn btn-secondary hidden">📄 Export ke TXT</button></div>
+            <div id="teamsGrid" class="teams-grid"></div>
+        </div>
+    </div>
+    <script>
+        // Global variables to store current state
+        let currentRegiments = [];
+        let currentTeams = [];
+        let generationStats = {};
+        let validationState = { isValid: false, errors: [], warnings: [] };
+
+        // DOM element references
+        const regimentsPerTeamInput = document.getElementById('regimentsPerTeam');
+        const regimentDataTextarea = document.getElementById('regimentData');
+        const fileInput = document.getElementById('fileInput');
+        const totalRegimentsSpan = document.getElementById('totalRegiments');
+        const totalMembersSpan = document.getElementById('totalMembers');
+        const teamsNeededSpan = document.getElementById('teamsNeeded');
+        const validationStatusSpan = document.getElementById('validationStatus');
+        const alertContainer = document.getElementById('alertContainer');
+        const generateBtn = document.getElementById('generateBtn');
+        const teamsOutput = document.getElementById('teamsOutput');
+        const teamsGrid = document.getElementById('teamsGrid');
+        const fileName = document.getElementById('fileName');
+        const generationInfo = document.getElementById('generationInfo');
+        const generationDetails = document.getElementById('generationDetails');
+        const exportBtn = document.getElementById('exportBtn');
+        const regimentPreview = document.getElementById('regimentPreview');
+        const regimentList = document.getElementById('regimentList');
+
+        // Event listeners
+        regimentsPerTeamInput.addEventListener('input', updateValidation);
+        regimentDataTextarea.addEventListener('input', updateValidation);
+        fileInput.addEventListener('change', handleFileInput);
+        generateBtn.addEventListener('click', generateTeams);
+        exportBtn.addEventListener('click', exportToTxt);
+
+        function handleFileInput(event) {
+            const file = event.target.files[0];
+            if (!file) { 
+                fileName.textContent = ''; 
+                return; 
+            }
+            
+            if (!file.name.toLowerCase().endsWith('.txt')) {
+                showAlert('File harus berformat .txt', 'danger'); 
+                fileInput.value = ''; 
+                fileName.textContent = ''; 
+                return;
+            }
+            
+            fileName.textContent = `📄 ${file.name}`;
+            const reader = new FileReader(); 
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const currentContent = regimentDataTextarea.value.trim();
+                regimentDataTextarea.value = currentContent ? (currentContent + '\n' + content) : content;
+                updateValidation();
+            };
+            reader.readAsText(file);
+        }
+
+        function showAlert(message, type = 'warning') { 
+            const alertDiv = document.createElement('div'); 
+            alertDiv.className = `alert alert-${type}`; 
+            alertDiv.textContent = message; 
+            alertContainer.appendChild(alertDiv); 
+        }
+
+        function clearAlerts() { 
+            alertContainer.innerHTML = ''; 
+        }
+
+        // Parse regiment data from text input
+        function parseRegimentData(text) {
+            const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+            const regiments = [];
+            
+            for (const line of lines) {
+                // Check if line contains the separator "|"
+                if (!line.includes('|')) {
+                    continue; // Skip lines that don't follow the format
+                }
+                
+                const [regimentName, membersText] = line.split('|').map(part => part.trim());
+                
+                if (!regimentName || !membersText) {
+                    continue; // Skip invalid entries
+                }
+                
+                // Parse members from comma-separated list
+                const members = membersText.split(',')
+                    .map(member => member.trim())
+                    .filter(member => member);
+                
+                if (members.length === 0) {
+                    continue; // Skip regiments with no members
+                }
+                
+                regiments.push({
+                    name: regimentName,
+                    members: members
+                });
+            }
+            
+            return regiments;
+        }
+
+        // Check for duplicate regiment names
+        function findDuplicateRegiments(regiments) {
+            const seen = new Set();
+            const duplicates = new Set();
+            
+            regiments.forEach(regiment => {
+                const lowerName = regiment.name.toLowerCase();
+                if (seen.has(lowerName)) {
+                    duplicates.add(regiment.name);
+                } else {
+                    seen.add(lowerName);
+                }
+            });
+            
+            return Array.from(duplicates);
+        }
+
+        // Update regiment preview display
+        function updateRegimentPreview(regiments) {
+            if (regiments.length === 0) {
+                regimentPreview.classList.add('hidden');
+                return;
+            }
+            
+            regimentList.innerHTML = '';
+            regiments.forEach(regiment => {
+                const regimentDiv = document.createElement('div');
+                regimentDiv.className = 'regiment-item';
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'regiment-name';
+                nameDiv.textContent = regiment.name;
+                
+                const membersDiv = document.createElement('div');
+                membersDiv.className = 'regiment-members';
+                membersDiv.textContent = `${regiment.members.length} anggota: ${regiment.members.join(', ')}`;
+                
+                regimentDiv.appendChild(nameDiv);
+                regimentDiv.appendChild(membersDiv);
+                regimentList.appendChild(regimentDiv);
+            });
+            
+            regimentPreview.classList.remove('hidden');
+        }
+
+        function updateValidation() {
+            clearAlerts();
+            const regimentsPerTeam = parseInt(regimentsPerTeamInput.value) || 0;
+            validationState = { isValid: false, errors: [], warnings: [] };
+            
+            // Validate regiments per team
+            if (regimentsPerTeam < 1) {
+                validationState.errors.push('Regu per tim minimal 1');
+            }
+            if (regimentsPerTeam > 10) {
+                validationState.errors.push('Regu per tim maksimal 10');
+            }
+            
+            // Parse and validate regiment data
+            currentRegiments = parseRegimentData(regimentDataTextarea.value.trim());
+            const totalRegiments = currentRegiments.length;
+            const totalMembers = currentRegiments.reduce((sum, regiment) => sum + regiment.members.length, 0);
+            
+            totalRegimentsSpan.textContent = totalRegiments;
+            totalMembersSpan.textContent = totalMembers;
+            
+            // Update regiment preview
+            updateRegimentPreview(currentRegiments);
+            
+            if (totalRegiments === 0) {
+                validationState.errors.push('Masukkan minimal 1 regu');
+                teamsNeededSpan.textContent = '0';
+            } else if (totalRegiments > 100) {
+                validationState.errors.push('Maksimal 100 regu');
+            } else {
+                const teamsNeeded = Math.ceil(totalRegiments / regimentsPerTeam);
+                teamsNeededSpan.textContent = teamsNeeded;
+                
+                // Check for duplicate regiment names
+                const duplicateRegiments = findDuplicateRegiments(currentRegiments);
+                if (duplicateRegiments.length > 0) {
+                    validationState.errors.push(`Nama regu duplikat ditemukan: ${duplicateRegiments.join(', ')}`);
+                }
+                
+                // Check for empty regiments
+                const emptyRegiments = currentRegiments.filter(r => r.members.length === 0);
+                if (emptyRegiments.length > 0) {
+                    validationState.errors.push(`Regu kosong ditemukan: ${emptyRegiments.map(r => r.name).join(', ')}`);
+                }
+                
+                // Warning for uneven distribution
+                if (totalRegiments % regimentsPerTeam !== 0) {
+                    const remainder = totalRegiments % regimentsPerTeam;
+                    validationState.warnings.push(`${remainder} regu akan tersisa dan akan didistribusikan secara acak ke tim lain`);
+                }
+            }
+            
+            // Update validation status
+            if (validationState.errors.length === 0) {
+                validationState.isValid = true;
+                validationStatusSpan.textContent = '✅ Siap generate';
+                validationStatusSpan.style.color = '#28a745';
+            } else {
+                validationStatusSpan.textContent = '❌ Ada masalah';
+                validationStatusSpan.style.color = '#dc3545';
+            }
+            
+            // Show alerts
+            validationState.errors.forEach(error => showAlert(error, 'danger'));
+            validationState.warnings.forEach(warning => showAlert(warning, 'info'));
+            
+            generateBtn.disabled = !validationState.isValid;
+        }
+
+        // Shuffle array using Fisher-Yates algorithm with multiple passes
+        function shuffleArray(arr) {
+            const shuffled = [...arr];
+            // Multiple shuffle passes for better randomization
+            for (let round = 0; round < 3; round++) {
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+            }
+            return shuffled;
+        }
+
+        // Main function to divide regiments into teams
+        function divideIntoTeams() {
+            const regimentsPerTeam = parseInt(regimentsPerTeamInput.value);
+            const totalRegiments = currentRegiments.length;
+            
+            // Shuffle the regiments for random distribution
+            const shuffledRegiments = shuffleArray(currentRegiments);
+            
+            // Calculate number of teams needed
+            const baseTeams = Math.floor(totalRegiments / regimentsPerTeam);
+            const remainder = totalRegiments % regimentsPerTeam;
+            
+            // Determine final number of teams
+            let numTeams;
+            if (remainder === 0) {
+                numTeams = baseTeams; // Perfect division
+            } else {
+                // We have leftover regiments - they will be distributed to existing teams
+                numTeams = baseTeams;
+                if (numTeams === 0) numTeams = 1; // At least one team needed
+            }
+            
+            // Initialize teams
+            const teams = Array.from({ length: numTeams }, () => []);
+            
+            // First, distribute regiments evenly
+            let regimentIndex = 0;
+            for (let teamIndex = 0; teamIndex < numTeams; teamIndex++) {
+                for (let r = 0; r < regimentsPerTeam && regimentIndex < totalRegiments; r++) {
+                    teams[teamIndex].push(shuffledRegiments[regimentIndex++]);
+                }
+            }
+            
+            // Distribute any remaining regiments randomly
+            if (regimentIndex < totalRegiments) {
+                const remainingRegiments = shuffledRegiments.slice(regimentIndex);
+                const teamIndices = shuffleArray([...Array(numTeams).keys()]);
+                
+                remainingRegiments.forEach((regiment, index) => {
+                    const targetTeam = teamIndices[index % numTeams];
+                    teams[targetTeam].push(regiment);
+                });
+            }
+            
+            // Calculate statistics
+            const teamSizes = teams.map(team => team.length);
+            generationStats = {
+                totalRegiments: totalRegiments,
+                totalMembers: currentRegiments.reduce((sum, r) => sum + r.members.length, 0),
+                requestedPerTeam: regimentsPerTeam,
+                numTeams: numTeams,
+                teamSizes: teamSizes,
+                minSize: Math.min(...teamSizes),
+                maxSize: Math.max(...teamSizes),
+                distributionMethod: remainder === 0 ? 'perfect' : 'distributed',
+                remainder: remainder
+            };
+            
+            return teams;
+        }
+
+        function displayGenerationInfo() {
+            const s = generationStats;
+            let html = `
+                <p><strong>Total regu:</strong> ${s.totalRegiments} regu</p>
+                <p><strong>Total anggota:</strong> ${s.totalMembers} orang</p>
+                <p><strong>Permintaan:</strong> ${s.requestedPerTeam} regu per tim</p>
+                <p><strong>Hasil:</strong> ${s.numTeams} tim terbentuk</p>
+            `;
+            
+            // Team size distribution
+            const sizeDistribution = {};
+            s.teamSizes.forEach(size => {
+                sizeDistribution[size] = (sizeDistribution[size] || 0) + 1;
+            });
+            
+            const distributionText = Object.keys(sizeDistribution)
+                .sort((a, b) => a - b)
+                .map(size => `${sizeDistribution[size]} tim dengan ${size} regu`)
+                .join(', ');
+            
+            html += `<p><strong>Distribusi:</strong> ${distributionText}</p>`;
+            
+            // Method explanation
+            let methodText = '';
+            if (s.distributionMethod === 'perfect') {
+                methodText = 'Pembagian sempurna - semua tim memiliki jumlah regu yang sama persis.';
+            } else {
+                methodText = `${s.remainder} regu sisa didistribusikan secara acak ke tim-tim yang sudah ada untuk menjaga keseimbangan.`;
+            }
+            
+            html += `
+                <p><strong>Metode:</strong> ${methodText}</p>
+                <p><strong>Pengacakan:</strong> Regu-regu diacak berkali-kali sebelum pembagian untuk memastikan distribusi yang adil dan acak.</p>
+            `;
+            
+            generationDetails.innerHTML = html;
+            generationInfo.classList.remove('hidden');
+        }
+
+        function exportToTxt() {
+            if (!currentTeams.length) {
+                showAlert('Tidak ada data tim untuk diekspor', 'danger');
+                return;
+            }
+            
+            let exportText = `Hasil Pembagian Tim Berdasarkan Regu\n`;
+            exportText += `Generated: ${new Date().toLocaleString('id-ID')}\n`;
+            exportText += `Total Regu: ${generationStats.totalRegiments}\n`;
+            exportText += `Total Anggota: ${generationStats.totalMembers}\n`;
+            exportText += `Permintaan: ${generationStats.requestedPerTeam} regu per tim\n`;
+            exportText += `Total Tim: ${generationStats.numTeams}\n\n`;
+            exportText += `${'='.repeat(60)}\n\n`;
+            
+            currentTeams.forEach((team, teamIndex) => {
+                exportText += `Tim ${teamIndex + 1}\n`;
+                exportText += `${'-'.repeat(20)}\n`;
+                
+                team.forEach((regiment, regimentIndex) => {
+                    exportText += `\n${regimentIndex + 1}. ${regiment.name}\n`;
+                    regiment.members.forEach((member, memberIndex) => {
+                        exportText += `   ${memberIndex + 1}. ${member}\n`;
+                    });
+                });
+                
+                exportText += `\nTotal: ${team.length} regu, ${team.reduce((sum, r) => sum + r.members.length, 0)} anggota\n\n`;
+            });
+            
+            exportText += `${'='.repeat(60)}\n`;
+            exportText += `Statistik:\n`;
+            exportText += `- Tim dengan regu terbanyak: ${generationStats.maxSize} regu\n`;
+            exportText += `- Tim dengan regu tersedikit: ${generationStats.minSize} regu\n`;
+            exportText += `- Selisih maksimal: ${generationStats.maxSize - generationStats.minSize} regu\n`;
+            
+            // Create and download file
+            const blob = new Blob([exportText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `pembagian-tim-regu-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            showAlert(`✅ File "${link.download}" berhasil diunduh`, 'warning');
+        }
+
+        function displayTeams(teams) {
+            currentTeams = teams;
+            teamsGrid.innerHTML = '';
+            
+            teams.forEach((team, teamIndex) => {
+                const teamCard = document.createElement('div');
+                teamCard.className = 'team-card';
+                
+                const teamHeader = document.createElement('div');
+                teamHeader.className = 'team-header';
+                teamHeader.textContent = `Tim ${teamIndex + 1}`;
+                
+                const regimentsList = document.createElement('div');
+                regimentsList.className = 'team-regiments';
+                
+                team.forEach(regiment => {
+                    const regimentDiv = document.createElement('div');
+                    regimentDiv.className = 'team-regiment';
+                    
+                    const regimentHeader = document.createElement('div');
+                    regimentHeader.className = 'regiment-header';
+                    regimentHeader.textContent = regiment.name;
+                    
+                    regimentDiv.appendChild(regimentHeader);
+                    
+                    regiment.members.forEach(member => {
+                        const memberDiv = document.createElement('div');
+                        memberDiv.className = 'regiment-member';
+                        memberDiv.textContent = `• ${member}`;
+                        regimentDiv.appendChild(memberDiv);
