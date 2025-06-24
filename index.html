@@ -22,24 +22,51 @@
         .file-input { position: absolute; left: -9999px; }
         .file-input-label { display: inline-block; padding: 12px 20px; background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 100%; font-size: 0.95rem; color: #666; }
         .file-input-label:hover { background: #e9ecef; border-color: #4facfe; }
+        
+        /* Toggle Switch Styling */
+        .toggle-container { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .toggle-switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #4facfe; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .toggle-label { font-weight: 600; color: #333; font-size: 0.95rem; }
+        
         .btn { display: inline-block; padding: 14px 30px; border: none; border-radius: 50px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; text-align: center; margin: 5px; }
         .btn-primary { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
         .btn-secondary { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
         .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3); }
         .btn-secondary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(168, 237, 234, 0.3); }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+        
         .teams-output { background: white; padding: 20px; border-radius: 15px; margin-top: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .teams-title { text-align: center; font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; color: #333; }
+        
+        /* Section Styling */
+        .section { margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 15px; border: 2px solid #e9ecef; }
+        .section-title { text-align: center; font-size: 1.3rem; font-weight: 700; margin-bottom: 15px; color: #333; padding: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; }
+        
         .teams-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; max-width: 100%; }
-        .team-card { background: #f8f9fa; border-radius: 12px; padding: 15px; border: 2px solid #e9ecef; transition: transform 0.2s ease; }
+        .team-card { background: white; border-radius: 12px; padding: 15px; border: 2px solid #e9ecef; transition: transform 0.2s ease; }
         .team-card:hover { transform: translateY(-2px); }
         .team-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 12px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; text-align: center; margin-bottom: 10px; }
         .team-members { list-style: none; }
-        .team-members li { padding: 6px 10px; margin-bottom: 4px; background: white; border-radius: 6px; font-size: 0.85rem; border: 1px solid #e9ecef; }
+        .team-members li { padding: 6px 10px; margin-bottom: 4px; background: #f8f9fa; border-radius: 6px; font-size: 0.85rem; border: 1px solid #e9ecef; }
         .team-members li:last-child { margin-bottom: 0; }
         .hidden { display: none; }
-        @media (max-width: 768px) { .header h1 { font-size: 1.5rem; } .form-section { padding: 20px; } .teams-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; } .team-card { padding: 12px; } .team-header { font-size: 0.8rem; padding: 6px 10px; } .team-members li { font-size: 0.8rem; padding: 5px 8px; } }
-        @media (max-width: 480px) { .teams-grid { grid-template-columns: repeat(2, 1fr); } }
+        
+        @media (max-width: 768px) { 
+            .header h1 { font-size: 1.5rem; } 
+            .form-section { padding: 20px; } 
+            .teams-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; } 
+            .team-card { padding: 12px; } 
+            .team-header { font-size: 0.8rem; padding: 6px 10px; } 
+            .team-members li { font-size: 0.8rem; padding: 5px 8px; } 
+        }
+        @media (max-width: 480px) { 
+            .teams-grid { grid-template-columns: repeat(2, 1fr); } 
+        }
     </style>
 </head>
 <body>
@@ -53,6 +80,18 @@
                 <label for="reguPerTim">Regu per Tim:</label>
                 <input type="number" id="reguPerTim" min="1" max="20" value="2">
             </div>
+            
+            <div class="toggle-container">
+                <span class="toggle-label">Mode 3 Bagian:</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="threeSectionMode">
+                    <span class="slider"></span>
+                </label>
+                <span class="toggle-label" style="font-weight: 400; font-size: 0.85rem; color: #666;">
+                    Aktifkan untuk membuat 3 pembagian yang berbeda
+                </span>
+            </div>
+            
             <div class="form-group">
                 <label for="reguList">Daftar Regu (satu per baris):</label>
                 <textarea id="reguList" placeholder="Masukkan nama-nama regu...\nContoh:\nRegu A\nRegu B\nRegu C"></textarea>
@@ -64,11 +103,13 @@
                     <label for="fileInput" class="file-input-label">📁 Pilih file .txt (opsional)</label>
                 </div>
             </div>
-            <div class="btn-container"><button id="generateBtn" class="btn btn-primary">🎲 Generate Tim</button></div>
+            <div class="btn-container">
+                <button id="generateBtn" class="btn btn-primary">🎲 Generate Tim</button>
+            </div>
         </div>
         <div id="teamsOutput" class="teams-output hidden">
             <h2 class="teams-title">📋 Hasil Pembagian Tim</h2>
-            <div id="teamsGrid" class="teams-grid"></div>
+            <div id="teamsContainer"></div>
         </div>
     </div>
     <script>
@@ -77,9 +118,10 @@
         const fileInput = document.getElementById('fileInput');
         const generateBtn = document.getElementById('generateBtn');
         const teamsOutput = document.getElementById('teamsOutput');
-        const teamsGrid = document.getElementById('teamsGrid');
+        const teamsContainer = document.getElementById('teamsContainer');
+        const threeSectionMode = document.getElementById('threeSectionMode');
 
-        // import .txt
+        // Handle file input - allows importing team names from text file
         fileInput.addEventListener('change', handleFileInput);
         function handleFileInput(event) {
             const file = event.target.files[0];
@@ -93,6 +135,7 @@
             reader.readAsText(file);
         }
 
+        // Fisher-Yates shuffle algorithm for randomizing arrays
         function shuffle(arr) {
             const a = arr.slice();
             for (let i = a.length - 1; i > 0; i--) {
@@ -102,18 +145,73 @@
             return a;
         }
 
-        function generateTim() {
-            const perTim = parseInt(reguPerTimInput.value);
-            let regus = reguListTextarea.value.split('\n').map(r => r.trim()).filter(r => r);
-            if (!regus.length) return alert('Masukkan minimal satu regu.');
+        // Track which teams have been paired together to avoid repetition
+        class PairingTracker {
+            constructor() {
+                this.pairings = new Set(); // Stores pairs as "teamA-teamB" strings
+            }
+            
+            // Record that two teams have been paired together
+            addPairing(team1, team2) {
+                const pair = [team1, team2].sort().join('-');
+                this.pairings.add(pair);
+            }
+            
+            // Check if two teams have been paired before
+            hasPairing(team1, team2) {
+                const pair = [team1, team2].sort().join('-');
+                return this.pairings.has(pair);
+            }
+            
+            // Calculate how many times a team has been paired with others in a list
+            getPairingCount(team, teamList) {
+                return teamList.filter(other => other !== team && this.hasPairing(team, other)).length;
+            }
+        }
+
+        // Generate a single team division
+        function generateSingleTim(regus, perTim, pairingTracker = null) {
             const shuffled = shuffle(regus);
             const numTim = Math.ceil(shuffled.length / perTim);
             const tims = Array.from({ length: numTim }, () => []);
-            shuffled.forEach((r, i) => tims[i % numTim].push(r));
+            
+            // If we have a pairing tracker, try to minimize repeated pairings
+            if (pairingTracker) {
+                // Sort teams by how many existing pairings they have (least paired first)
+                const sortedRegus = shuffled.sort((a, b) => {
+                    const aPairings = pairingTracker.getPairingCount(a, regus);
+                    const bPairings = pairingTracker.getPairingCount(b, regus);
+                    return aPairings - bPairings;
+                });
+                
+                // Assign teams trying to minimize conflicts
+                sortedRegus.forEach(regu => {
+                    // Find the team with the fewest existing pairings with this regu
+                    let bestTeamIndex = 0;
+                    let minConflicts = Infinity;
+                    
+                    for (let i = 0; i < tims.length; i++) {
+                        if (tims[i].length >= perTim) continue; // Skip full teams
+                        
+                        const conflicts = tims[i].filter(teammate => 
+                            pairingTracker.hasPairing(regu, teammate)
+                        ).length;
+                        
+                        if (conflicts < minConflicts) {
+                            minConflicts = conflicts;
+                            bestTeamIndex = i;
+                        }
+                    }
+                    
+                    tims[bestTeamIndex].push(regu);
+                });
+            } else {
+                // Simple round-robin assignment for first division
+                shuffled.forEach((r, i) => tims[i % numTim].push(r));
+            }
 
-            // simpan snapshot Tim 1 sebelum koreksi
+            // Handle teams with only one member by adding duplicates from Team 1
             const originalFirst = tims[0].slice();
-            // perbaiki tim dengan satu regu: tambahkan salinan dari Tim 1
             tims.forEach((tim, idx) => {
                 if (tim.length === 1 && idx !== 0) {
                     const pick = originalFirst[Math.floor(Math.random() * originalFirst.length)];
@@ -124,22 +222,116 @@
             return tims;
         }
 
-        function displayTims(tims) {
-            teamsGrid.innerHTML = '';
-            tims.forEach((tim, idx) => {
-                const card = document.createElement('div'); card.className = 'team-card';
-                const header = document.createElement('div'); header.className = 'team-header'; header.textContent = `Tim ${idx+1}`;
-                const list = document.createElement('ul'); list.className = 'team-members';
-                tim.forEach(r => { const li = document.createElement('li'); li.textContent = r; list.appendChild(li); });
-                card.appendChild(header); card.appendChild(list); teamsGrid.appendChild(card);
+        // Generate three different team divisions with minimal overlap
+        function generateThreeSections(regus, perTim) {
+            const pairingTracker = new PairingTracker();
+            const sections = [];
+            
+            // Generate first section normally
+            const section1 = generateSingleTim(regus, perTim);
+            sections.push(section1);
+            
+            // Record all pairings from section 1
+            section1.forEach(team => {
+                for (let i = 0; i < team.length; i++) {
+                    for (let j = i + 1; j < team.length; j++) {
+                        pairingTracker.addPairing(team[i], team[j]);
+                    }
+                }
             });
+            
+            // Generate sections 2 and 3 using the pairing tracker
+            for (let sectionNum = 2; sectionNum <= 3; sectionNum++) {
+                const newSection = generateSingleTim(regus, perTim, pairingTracker);
+                sections.push(newSection);
+                
+                // Record pairings from this section
+                newSection.forEach(team => {
+                    for (let i = 0; i < team.length; i++) {
+                        for (let j = i + 1; j < team.length; j++) {
+                            pairingTracker.addPairing(team[i], team[j]);
+                        }
+                    }
+                });
+            }
+            
+            return sections;
+        }
+
+        // Main generation function that handles both modes
+        function generateTim() {
+            const perTim = parseInt(reguPerTimInput.value);
+            let regus = reguListTextarea.value.split('\n').map(r => r.trim()).filter(r => r);
+            
+            if (!regus.length) {
+                alert('Masukkan minimal satu regu.');
+                return null;
+            }
+            
+            if (threeSectionMode.checked) {
+                return generateThreeSections(regus, perTim);
+            } else {
+                return [generateSingleTim(regus, perTim)];
+            }
+        }
+
+        // Display the generated teams
+        function displayTims(allSections) {
+            teamsContainer.innerHTML = '';
+            
+            allSections.forEach((tims, sectionIndex) => {
+                // Create section container
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'section';
+                
+                // Create section title
+                const sectionTitle = document.createElement('div');
+                sectionTitle.className = 'section-title';
+                sectionTitle.textContent = allSections.length > 1 ? `📋 Bagian ${sectionIndex + 1}` : '';
+                if (allSections.length > 1) {
+                    sectionDiv.appendChild(sectionTitle);
+                }
+                
+                // Create teams grid
+                const teamsGrid = document.createElement('div');
+                teamsGrid.className = 'teams-grid';
+                
+                tims.forEach((tim, idx) => {
+                    const card = document.createElement('div');
+                    card.className = 'team-card';
+                    
+                    const header = document.createElement('div');
+                    header.className = 'team-header';
+                    header.textContent = `Tim ${idx + 1}`;
+                    
+                    const list = document.createElement('ul');
+                    list.className = 'team-members';
+                    
+                    tim.forEach(r => {
+                        const li = document.createElement('li');
+                        li.textContent = r;
+                        list.appendChild(li);
+                    });
+                    
+                    card.appendChild(header);
+                    card.appendChild(list);
+                    teamsGrid.appendChild(card);
+                });
+                
+                sectionDiv.appendChild(teamsGrid);
+                teamsContainer.appendChild(sectionDiv);
+            });
+            
             teamsOutput.classList.remove('hidden');
             teamsOutput.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
+        // Event listener for the generate button
         generateBtn.addEventListener('click', () => {
-            const tims = generateTim();
-            if (tims) displayTims(tims);
+            const allSections = generateTim();
+            if (allSections) {
+                displayTims(allSections);
+            }
         });
     </script>
 </body>
