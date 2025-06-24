@@ -18,6 +18,14 @@
         .form-group input, .form-group textarea { width: 100%; padding: 12px 15px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; font-family: inherit; }
         .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #4facfe; box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1); }
         .form-group textarea { resize: vertical; min-height: 120px; }
+        .file-input-container { position: relative; display: inline-block; width: 100%; margin-top: 10px; }
+        .file-input { position: absolute; left: -9999px; }
+        .file-input-label { display: inline-block; padding: 12px 20px; background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; text-align: center; width: 100%; font-size: 0.95rem; color: #666; }
+        .file-input-label:hover { background: #e9ecef; border-color: #4facfe; }
+        .status-section { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .status-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.9rem; }
+        .status-label { font-weight: 500; color: #666; }
+        .status-value { font-weight: 600; color: #333; }
         .btn { display: inline-block; padding: 14px 30px; border: none; border-radius: 50px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; text-align: center; margin: 5px; }
         .btn-primary { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
         .btn-secondary { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
@@ -33,7 +41,6 @@
         .team-members { list-style: none; }
         .team-members li { padding: 6px 10px; margin-bottom: 4px; background: white; border-radius: 6px; font-size: 0.85rem; border: 1px solid #e9ecef; }
         .team-members li:last-child { margin-bottom: 0; }
-        .loading { text-align: center; padding: 20px; color: #666; font-style: italic; }
         .hidden { display: none; }
         @media (max-width: 768px) { .header h1 { font-size: 1.5rem; } .form-section { padding: 20px; } .teams-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; } .team-card { padding: 12px; } .team-header { font-size: 0.8rem; padding: 6px 10px; } .team-members li { font-size: 0.8rem; padding: 5px 8px; } }
         @media (max-width: 480px) { .teams-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -54,6 +61,13 @@
                 <label for="reguList">Daftar Regu (satu per baris):</label>
                 <textarea id="reguList" placeholder="Masukkan nama-nama regu...\nContoh:\nRegu A\nRegu B\nRegu C"></textarea>
             </div>
+            <div class="form-group">
+                <label>Import File (.txt):</label>
+                <div class="file-input-container">
+                    <input type="file" id="fileInput" class="file-input" accept=".txt">
+                    <label for="fileInput" class="file-input-label">📁 Pilih file .txt (opsional)</label>
+                </div>
+            </div>
             <div class="btn-container"><button id="generateBtn" class="btn btn-primary">🎲 Generate Tim</button></div>
         </div>
         <div id="teamsOutput" class="teams-output hidden">
@@ -64,9 +78,23 @@
     <script>
         const reguPerTimInput = document.getElementById('reguPerTim');
         const reguListTextarea = document.getElementById('reguList');
+        const fileInput = document.getElementById('fileInput');
         const generateBtn = document.getElementById('generateBtn');
         const teamsOutput = document.getElementById('teamsOutput');
         const teamsGrid = document.getElementById('teamsGrid');
+
+        fileInput.addEventListener('change', handleFileInput);
+        function handleFileInput(event) {
+            const file = event.target.files[0];
+            if (!file || !file.name.toLowerCase().endsWith('.txt')) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const content = e.target.result;
+                const current = reguListTextarea.value.trim();
+                reguListTextarea.value = current ? (current + '\n' + content) : content;
+            };
+            reader.readAsText(file);
+        }
 
         function shuffle(arr) {
             const a = arr.slice();
@@ -85,11 +113,14 @@
             const numTim = Math.ceil(shuffled.length / perTim);
             const tims = Array.from({ length: numTim }, () => []);
             shuffled.forEach((r, i) => tims[i % numTim].push(r));
-            // jika ada tim dengan hanya satu regu, ambil satu dari Tim pertama
-            const firstTim = tims[0];
+            // perbaiki tim dengan satu regu: ambil dari tim dengan anggota > perTim (kecuali tim itu sendiri)
             tims.forEach((tim, idx) => {
-                if (tim.length === 1 && firstTim.length > 1) {
-                    tim.push(firstTim.shift());
+                if (tim.length === 1) {
+                    // cari donor selain idx
+                    const donorIdx = tims.findIndex((t, j) => t.length > perTim && j !== idx);
+                    if (donorIdx !== -1) {
+                        tim.push(tims[donorIdx].pop());
+                    }
                 }
             });
             return tims;
